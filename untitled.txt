@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>DigitalBox - Marketplace</title>
+<style>
+  /* Reset e básico */
+  * {
+    box-sizing: border-box;
+    margin: 0; padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+  body {
+    background: #f0f3f8;
+    color: #222;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  header {
+    background: #1a202c;
+    color: white;
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  header h1 {
+    cursor: pointer;
+  }
+  nav {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  nav button {
+    background: transparent;
+    border: 2px solid white;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+  nav button:hover {
+    background: white;
+    color: #1a202c;
+  }
+  main {
+    flex-grow: 1;
+    max-width: 1100px;
+    margin: 2rem auto;
+    width: 100%;
+    padding: 0 1rem;
+  }
+  .hidden { display: none !important; }
+  form {
+    background: white;
+    padding: 2rem;
+    max-width: 400px;
+    margin: 1rem auto;
+    border-radius: 10px;
+    box-shadow: 0 3px 8px rgb(0 0 0 / 0.12);
+  }
+  form h2 {
+    margin-bottom: 1rem;
+    text-align: center;
+  }
+  label {
+    font-weight: 600;
+    margin-top: 1rem;
+    display: block;
+  }
+  input, select, textarea {
+    width: 100%;
+    padding: 0.6rem;
+    margin-top: 0.3rem;
+    border-radius: 6px;
+    border: 1.8px solid #bbb;
+    font-size: 1rem;
+    transition: 0.3s;
+  }
+  input:focus, select:focus, textarea:focus {
+    border-color: #3182ce;
+    outline: none;
+  }
+  button.submit-btn {
+    margin-top: 1.5rem;
+    background: #3182ce;
+    color: white;
+    border: none;
+    font-weight: 700;
+    padding: 0.8rem;
+    width: 100%;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+  button.submit-btn:hover {
+    background: #225ea8;
+  }
+  .products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill,minmax(260px,1fr));
+    gap: 1.3rem;
+  }
+  .product-card {
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 3px 8px rgb(0 0 0 / 0.1);
+    border-left: 6px solid transparent;
+    display: flex;
+    flex-direction: column;
+  }
+  .product-card:hover {
+    transform: translateY(-5px);
+    transition: 0.2s;
+  }
+  .product-img {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+  }
+  .product-info {
+    padding: 1rem;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .product-title {
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin-bottom: 0.3rem;
+  }
+  .product-price {
+    color: #3182ce;
+    font-weight: 700;
+    font-size: 1.2rem;
+  }
+  .product-vendedor {
+    margin-top: 0.4rem;
+    font-size: 0.9rem;
+    color: #555;
+  }
+  .product-diamante { border-left-color: #c6a700; }
+  .product-platina { border-left-color: #0c61ff; }
+  .product-normal { border-left-color: #777; }
+  .filters {
+    margin-bottom: 1.8rem;
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .filters select, .filters input[type="text"] {
+    padding: 0.5rem;
+    font-size: 1rem;
+    border-radius: 6px;
+    border: 1.8px solid #bbb;
+    min-width: 160px;
+  }
+  /* Compra */
+  #page-compra .info-compra {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgb(0 0 0 / 0.15);
+    max-width: 400px;
+    margin: 1rem auto;
+  }
+  #page-compra .info-compra p {
+    margin-bottom: 1rem;
+    font-weight: 600;
+  }
+  #page-compra button {
+    margin-top: 1rem;
+  }
+  /* PIX Pagamento */
+  .pix-code {
+    font-family: monospace;
+    background: #e2e8f0;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    user-select: all;
+  }
+  .timer {
+    font-weight: 700;
+    color: #d53f3f;
+    margin-top: 1rem;
+    text-align: center;
+  }
+  /* Chat */
+  #page-chat {
+    max-width: 500px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgb(0 0 0 / 0.15);
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    height: 450px;
+  }
+  #messages {
+    flex-grow: 1;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    padding: 0.8rem;
+    border-radius: 6px;
+    background: #f7fafc;
+  }
+  .message {
+    margin-bottom: 0.8rem;
+  }
+  .message.remetente {
+    text-align: right;
+  }
+  .message p {
+    display: inline-block;
+    padding: 0.6rem 1rem;
+    border-radius: 20px;
+    max-width: 75%;
+    word-wrap: break-word;
+  }
+  .message.remetente p {
+    background: #3182ce;
+    color: white;
+  }
+  .message.destinatario p {
+    background: #e2e8f0;
+    color: #333;
+  }
+  #chat-form {
+    margin-top: 1rem;
+    display: flex;
+    gap: 0.5rem;
+  }
+  #chat-input {
+    flex-grow: 1;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    border-radius: 20px;
+    border: 1.8px solid #bbb;
+    outline: none;
+  }
+  #chat-send {
+    background: #3182ce;
+    color: white;
+    border: none;
+    padding: 0 1.5rem;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: 700;
+    transition: 0.3s;
+  }
+  #chat-send:hover {
+    background: #225ea8;
+  }
+  /* Mensagens de erro e sucesso */
+  .message-text {
+    text-align: center;
+    margin-top: 1rem;
+    font-weight: 600;
+  }
+  .error {
+    color: #d53f3f;
+  }
+  .success {
+    color: #2f855a;
+  }
+  /* Responsivo */
+  @media (max-width:600px){
+    nav {
+      justify-content: center;
+    }
+  }
+  footer {
+    text-align: center;
+    padding: 1rem;
+    background: #1a202c;
+    color: white;
+    margin-top: auto;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1 id="logo">DigitalBox</h1>
+  <nav>
+    <button id="btn-home">Início</button>
+    <button id="btn-produtos">Produtos</button>
+    <button id="btn-criar-produto" class="hidden">Criar Produto</button>
+    <button id="btn-chat" class="hidden">Chat</button>
+    <button id="btn-login">Entrar / Cadastrar</button>
+    <button id="btn-logout" class="hidden">Sair</button>
+  </nav>
+</header>
+
+<main>
+
+  <!-- Página Inicial -->
+  <section id="page-home">
+    <h2>Produtos em Destaque</h2>
+    <div class="products-grid" id="destaque-produtos"></div>
+  </section>
+
+  <!-- Página Listar Produtos -->
+  <section id="page-produtos" class="hidden">
+    <h2>Produtos</h2>
+    <div class="filters">
+      <select id="filtro-tipo-conta">
+        <option value="todos">Todos os tipos de conta</option>
+        <option value="Diamante">Diamante</option>
+        <option value="Platina">Platina</option>
+        <option value="Normal">Normal</option>
+      </select>
+      <input type="text" id="filtro-nome" placeholder="Buscar por nome..." />
+    </div>
+    <div class="products-grid" id="lista-produtos"></div>
+  </section>
+
+  <!-- Página Criar Produto -->
+  <section id="page-criar-produto" class="hidden">
+    <h2>Criar Produto</h2>
+    <form id="form-criar-produto">
+      <label for="produto-nome">Nome do Produto</label>
+      <input type="text" id="produto-nome" required />
+      <label for="produto-preco">Preço (R$)</label>
+      <input type="number" id="produto-preco" min="0.01" step="0.01" required />
+      <label for="produto-imagem">URL da Imagem</label>
+      <input type="url" id="produto-imagem" placeholder="https://..." required />
+      <label for="produto-tipo-conta">Tipo da Conta do Vendedor</label>
+      <select id="produto-tipo-conta" required>
+        <option value="Normal">Normal</option>
+        <option value="Platina">Platina</option>
+        <option value="Diamante">Diamante</option>
+      </select>
+      <button type="submit" class="submit-btn">Cadastrar Produto</button>
+      <div id="msg-produto" class="message-text"></div>
+    </form>
+  </section>
+
+  <!-- Página Login / Cadastro -->
+  <section id="page-login" class="hidden">
+    <h2>Entrar ou Cadastrar</h2>
+    <form id="form-login">
+      <label for="login-tipo">Sou</label>
+      <select id="login-tipo" required>
+        <option value="">Selecione</option>
+        <option value="vendedor">Vendedor</option>
+        <option value="comprador">Comprador</option>
+      </select>
+      <label for="login-usuario">Nome de Usuário</label>
+      <input type="text" id="login-usuario" placeholder="Seu usuário" required />
+      <label for="login-plano" id="label-plano" class="hidden">Plano do Vendedor</label>
+      <select id="login-plano" class="hidden" required>
+        <option value="Normal">Normal (5% taxa)</option>
+        <option value="Platina">Platina (7% taxa)</option>
+        <option value="Diamante">Diamante (10% taxa)</option>
+      </select>
+      <button type="submit" class="submit-btn">Entrar / Cadastrar</button>
+      <div id="msg-login" class="message-text"></div>
+    </form>
+  </section>
+
+  <!-- Página Compra -->
+  <section id="page-compra" class="hidden">
+    <h2>Compra do Produto</h2>
+    <div class="info-compra" id="info-compra"></div>
+    <form id="form-compra" class="hidden">
+      <label>Escolha a forma de pagamento:</label>
+      <select id="forma-pagamento" required>
+        <option value="">Selecione</option>
+        <option value="PIX">PIX (com taxa)</option>
+        <option value="ROB">Robux (sem taxa)</option>
+      </select>
+      <button type="submit" class="submit-btn">Finalizar Compra</button>
+    </form>
+    <div id="msg-compra" class="message-text"></div>
+    <div id="pix-info" class="hidden" style="margin-top:1rem; text-align:center;">
+      <p>Pague a taxa PIX para o CPF <strong>408.839.948-01</strong></p>
+      <p class="pix-code">Chave PIX: 408.839.948-01</p>
+      <p>Após o pagamento, confirme aqui:</p>
+      <button id="btn-confirmar-pix" class="submit-btn">Confirmar Pagamento</button>
+      <div id="pix-timer" class="timer"></div>
+    </div>
+  </section>
+
+  <!-- Página Chat -->
+  <section id="page-chat" class="hidden">
+    <h2>Chat Simples</h2>
+    <div id="chat-info" style="text-align:center; margin-bottom:10px;"></div>
+    <div id="messages"></div>
+    <form id="chat-form">
+      <input id="chat-input" type="text" placeholder="Digite sua mensagem..." autocomplete="off" required />
+      <button id="chat-send" type="submit">Enviar</button>
+    </form>
+  </section>
+
+</main>
+
+<footer>
+  &copy; 2025 DigitalBox - Marketplace
+</footer>
+
+<script>
+  // --- Dados no localStorage ---
+  // vendedores: [{usuario, plano, taxaPaga:boolean}]
+  // compradores: [{usuario}]
+  // produtos: [{id, nome, preco, imagem, vendedor, plano}]
+  // chats: [{idChat, usuario1, usuario2, mensagens: [{de, texto, timestamp}]}]
+
+  // Helpers para localStorage
+  function getData(key) {
+    const data = localStorage.getItem(key);
+    return data ? JSON.parse(data) : [];
+  }
+  function setData(key, data) {
+    localStorage.setItem(key, JSON.stringify(data));
+  }
+
+  // Globals
+  let usuarioLogado = null; // {usuario, tipo, plano, taxaPaga}
+  let produtoSelecionado = null;
+  let pixTimerId = null;
+  const PIX_TIMEOUT = 10 * 60; // 10 minutos em segundos
+  let tempoRestante = PIX_TIMEOUT;
+  let chatAtual = null;
+
+  // DOM Elements
+  const btnHome = document.getElementById('btn-home');
+  const btnProdutos = document.getElementById('btn-produtos');
+  const btnCriarProduto = document.getElementById('btn-criar-produto');
+  const btnChat = document.getElementById('btn-chat');
+  const btnLogin = document.getElementById('btn-login');
+  const btnLogout = document.getElementById('btn-logout');
+  const logo = document.getElementById('logo');
+
+  const pageHome = document.getElementById('page-home');
+  const pageProdutos = document.getElementById('page-produtos');
+  const pageCriarProduto = document.getElementById('page-criar-produto');
+  const pageLogin = document.getElementById('page-login');
+  const pageCompra = document.getElementById('page-compra');
+  const pageChat = document.getElementById('page-chat');
+
+  const destaqueProdutosDiv = document.getElementById('destaque-produtos');
+  const listaProdutosDiv = document.getElementById('lista-produtos');
+
+  const filtroTipoConta = document.getElementById('filtro-tipo-conta');
+  const filtroNome = document.getElementById('filtro-nome');
+
+  const formCriarProduto = document.getElementById('form-criar-produto');
+  const msgProduto = document.getElementById('msg-produto');
+
+  const formLogin = document.getElementById('form-login');
+  const loginTipo = document.getElementById('login-tipo');
+  const loginPlano = document.getElementById('login-plano');
+  const labelPlano = document.getElementById('label-plano');
+  const msgLogin = document.getElementById('msg-login');
+
+  const infoCompra = document.getElementById('info-compra');
+  const formCompra = document.getElementById('form-compra');
+  const formaPagamento = document.getElementById('forma-pagamento');
+  const msgCompra = document.getElementById('msg-compra');
+  const pixInfo = document.getElementById('pix-info');
+  const btnConfirmarPix = document.getElementById('btn-confirmar-pix');
+  const pixTimer = document.getElementById('pix-timer');
+
+  const chatInfo = document.getElementById('chat-info');
+  const messagesDiv = document.getElementById('messages');
+  const chatForm = document.getElementById('chat-form');
+  const chatInput = document.getElementById('chat-input');
+
+  // Função para formatar tempo (mm:ss)
+  function formatarTempo(segundos) {
+    const m = Math.floor(segundos / 60).toString().padStart(2, '0');
+    const s = (segundos % 60).toString().padStart(2, '0');
+    return `${m}:${s}`;
+  }
+
+  // Mostrar página correta
+  function mostrarPagina(paginaId) {
+    [pageHome, pageProdutos, pageCriarProduto, pageLogin, pageCompra, pageChat].forEach(sec => {
+      sec.classList.add('hidden');
+    });
+    document.getElementById(paginaId).classList.remove('hidden');
+  }
+
+  // Atualizar interface com base no login
+  function atualizarInterface() {
+    if (usuarioLogado) {
+      btnLogin.classList.add('hidden');
+      btnLogout.classList.remove('hidden');
+      if (usuarioLogado.tipo === 'vendedor') {
+        btnCriarProduto.classList.remove('hidden');
+        btnChat.classList.remove('hidden');
+      } else {
+        btnCriarProduto.classList.add('hidden');
+        btnChat.classList.remove('hidden');
+      }
+    } else {
+      btnLogin.classList.remove('hidden');
+      btnLogout.classList.add('hidden');
+      btnCriarProduto.classList.add('hidden');
+      btnChat.classList.add('hidden');
+    }
+  }
+
+  // Salvar usuário logado no localStorage
+  function salvarUsuarioLogado() {
+    localStorage.setItem('usuarioLogado', JSON.stringify(usuarioLogado));
+  }
+  
+  // Carregar usuário logado
+  function carregarUsuarioLogado() {
+    const user = localStorage.getItem('usuarioLogado');
+    if (user) {
+      usuarioLogado = JSON.parse(user);
+    }
+  }
+
+  // Logout
+  function deslogarUsuario() {
+    usuarioLogado = null;
+    localStorage.removeItem('usuarioLogado');
+    if (pixTimerId) clearInterval(pixTimerId);
+    tempoRestante = PIX_TIMEOUT;
+    pixTimer.textContent = '';
+    pixInfo.classList.add('hidden');
+    msgCompra.textContent = '';
+    atualizarInterface();
+    mostrarPagina('page-login');
+  }
+
+  // Ordena produtos por plano: Diamante > Platina > Normal e por nome
+  function ordenarProdutos(produtos) {
+    const prioridade = { 'Diamante': 3, 'Platina': 2, 'Normal': 1 };
+    return produtos.sort((a,b) => {
+      if (prioridade[b.plano] !== prioridade[a.plano]) {
+        return prioridade[b.plano] - prioridade[a.plano];
+      }
+      return a.nome.localeCompare(b.nome);
+    });
+  }
+
+  // Mostrar produtos em destaque na home (top 6)
+  function mostrarProdutosDestaque() {
+    const produtos = getData('produtos');
+    const ordenados = ordenarProdutos(produtos).slice(0,6);
+    destaqueProdutosDiv.innerHTML = '';
+    if (ordenados.length === 0) {
+      destaqueProdutosDiv.textContent = 'Nenhum produto disponível.';
+      return;
+    }
+    ordenados.forEach(prod => {
+      destaqueProdutosDiv.appendChild(criarCardProduto(prod));
+    });
+  }
+
+  // Criar card produto
+  function criarCardProduto(prod) {
+    const card = document.createElement('div');
+    card.classList.add('product-card');
+    if (prod.plano === 'Diamante') card.classList.add('product-diamante');
+    else if (prod.plano === 'Platina') card.classList.add('product-platina');
+    else card.classList.add('product-normal');
+
+    card.innerHTML = `
+      <img src="${prod.imagem}" alt="${prod.nome}" class="product-img" />
+      <div class="product-info">
+        <div>
+          <div class="product-title">${prod.nome}</div>
+          <div class="product-price">R$ ${prod.preco.toFixed(2)}</div>
+          <div class="product-vendedor">Vendedor: ${prod.vendedor} (${prod.plano})</div>
+        </div>
+        <button class="submit-btn btn-comprar" style="margin-top:10px;">Comprar</button>
+      </div>
+    `;
+
+    card.querySelector('.btn-comprar').addEventListener('click', () => {
+      if (!usuarioLogado) {
+        alert('Você precisa estar logado para comprar.');
+        mostrarPagina('page-login');
+        return;
+      }
+      produtoSelecionado = prod;
+      prepararCompra();
+    });
+
+    return card;
+  }
+
+  // Mostrar lista de produtos com filtros
+  function mostrarListaProdutos() {
+    const produtos = getData('produtos');
+    let filtrados = produtos;
+
+    const filtroPlano = filtroTipoConta.value;
+    const filtroNomeValor = filtroNome.value.toLowerCase();
+
+    if (filtroPlano !== 'todos') {
+      filtrados = filtrados.filter(p => p.plano === filtroPlano);
+    }
+    if (filtroNomeValor) {
+      filtrados = filtrados.filter(p => p.nome.toLowerCase().includes(filtroNomeValor));
+    }
+
+    filtrados = ordenarProdutos(filtrados);
+
+    listaProdutosDiv.innerHTML = '';
+    if (filtrados.length === 0) {
+      listaProdutosDiv.textContent = 'Nenhum produto encontrado.';
+      return;
+    }
+    filtrados.forEach(prod => {
+      listaProdutosDiv.appendChild(criarCardProduto(prod));
+    });
+  }
+
+  // Preparar compra - mostrar detalhes e escolha forma pagamento
+  function prepararCompra() {
+    infoCompra.innerHTML = `
+      <p><strong>Produto:</strong> ${produtoSelecionado.nome}</p>
+      <p><strong>Preço:</strong> R$ ${produtoSelecionado.preco.toFixed(2)}</p>
+      <p><strong>Vendedor:</strong> ${produtoSelecionado.vendedor} (${produtoSelecionado.plano})</p>
+    `;
+    formaPagamento.value = '';
+    msgCompra.textContent = '';
+    pixInfo.classList.add('hidden');
+    formCompra.classList.remove('hidden');
+    mostrarPagina('page-compra');
+  }
+
+  // Iniciar timer PIX
+  function iniciarContagemPIX() {
+    tempoRestante = PIX_TIMEOUT;
+    pixTimer.textContent = formatarTempo(tempoRestante);
+
+    if (pixTimerId) clearInterval(pixTimerId);
+
+    pixTimerId = setInterval(() => {
+      tempoRestante--;
+      pixTimer.textContent = formatarTempo(tempoRestante);
+      if (tempoRestante <= 0) {
+        clearInterval(pixTimerId);
+        alert('Tempo para pagar PIX acabou! Você será deslogado.');
+        deslogarUsuario();
+      }
+    }, 1000);
+  }
+
+  // Confirmar pagamento PIX (simulado)
+  function confirmarPagamentoPIX() {
+    if (!usuarioLogado || usuarioLogado.tipo !== 'vendedor') {
+      alert('Apenas vendedores podem confirmar pagamento.');
+      return;
+    }
+    // Marca taxa como paga
+    const vendedores = getData('vendedores');
+    const idx = vendedores.findIndex(v => v.usuario === usuarioLogado.usuario);
+    if (idx !== -1) {
+      vendedores[idx].taxaPaga = true;
+      setData('vendedores', vendedores);
+      usuarioLogado.taxaPaga = true;
+      salvarUsuarioLogado();
+      alert('Pagamento confirmado! Você já pode continuar usando o site.');
+      pixInfo.classList.add('hidden');
+      formCompra.classList.add('hidden');
+      if (pixTimerId) clearInterval(pixTimerId);
+      tempoRestante = PIX_TIMEOUT;
+      pixTimer.textContent = '';
+      mostrarPagina('page-home');
+      atualizarInterface();
+    }
+  }
+
+  // Adicionar produto
+  function adicionarProduto(produto) {
+    const produtos = getData('produtos');
+    produtos.push(produto);
+    setData('produtos', produtos);
+  }
+
+  // Login/Cadastro
+  function loginOuCadastro(usuario, tipo, plano) {
+    if (!usuario || !tipo) return false;
+    if (tipo === 'vendedor' && !plano) return false;
+
+    if (tipo === 'vendedor') {
+      let vendedores = getData('vendedores');
+      let v = vendedores.find(v => v.usuario === usuario);
+      if (!v) {
+        // cadastra
+        v = { usuario, plano, taxaPaga: false };
+        vendedores.push(v);
+        setData('vendedores', vendedores);
+      } else {
+        // atualiza plano (se mudou)
+        if (v.plano !== plano) {
+          v.plano = plano;
+          v.taxaPaga = false; // precisa pagar nova taxa
+          setData('vendedores', vendedores);
+        }
+      }
+      usuarioLogado = { usuario, tipo, plano: v.plano, taxaPaga: v.taxaPaga };
+    } else if (tipo === 'comprador') {
+      let compradores = getData('compradores');
+      let c = compradores.find(c => c.usuario === usuario);
+      if (!c) {
+        c = { usuario };
+        compradores.push(c);
+        setData('compradores', compradores);
+      }
+      usuarioLogado = { usuario, tipo };
+    }
+    salvarUsuarioLogado();
+    return true;
+  }
+
+  // IDs para o chat: usa string com usuario1_usuario2 ordenados alfabeticamente para garantir um chat único entre dois usuários
+  function getIdChat(u1, u2) {
+    return [u1, u2].sort().join('_');
+  }
+
+  // Carregar chat
+  function carregarChat() {
+    if (!usuarioLogado) return;
+    
+    chatInfo.textContent = `Logado como: ${usuarioLogado.usuario} (${usuarioLogado.tipo})`;
+    messagesDiv.innerHTML = '';
+    
+    // Para simplificar, o chat será com vendedor ou comprador aleatório
+    const outrosUsuarios = usuarioLogado.tipo === 'vendedor'
+      ? getData('compradores').map(c => c.usuario)
+      : getData('vendedores').map(v => v.usuario);
+
+    if (outrosUsuarios.length === 0) {
+      messagesDiv.textContent = 'Nenhum usuário disponível para conversar no momento.';
+      return;
+    }
+
+    const parceiro = outrosUsuarios[0]; // Simplesmente o primeiro da lista
+    const idChat = getIdChat(usuarioLogado.usuario, parceiro);
+    const chats = getData('chats');
+    
+    chatAtual = chats.find(c => c.idChat === idChat) || {
+      idChat,
+      usuario1: usuarioLogado.usuario,
+      usuario2: parceiro,
+      mensagens: []
+    };
+    
+    if (!chats.some(c => c.idChat === idChat)) {
+      chats.push(chatAtual);
+      setData('chats', chats);
+    }
+    
+    renderizarMensagens(chatAtual);
+  }
+
+  // Renderizar mensagens do chat
+  function renderizarMensagens(chat) {
+    messagesDiv.innerHTML = '';
+    chat.mensagens.forEach(m => {
+      const div = document.createElement('div');
+      div.classList.add('message');
+      div.classList.add(m.de === usuarioLogado.usuario ? 'remetente' : 'destinatario');
+      div.innerHTML = `<p>${m.texto}</p>`;
+      messagesDiv.appendChild(div);
+    });
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+  }
+
+  // Enviar mensagem no chat
+  function enviarMensagemChat(texto) {
+    if (!usuarioLogado || !chatAtual) return;
+    
+    const novaMensagem = {
+      de: usuarioLogado.usuario,
+      texto,
+      timestamp: Date.now()
+    };
+    
+    chatAtual.mensagens.push(novaMensagem);
+    
+    // Atualiza no localStorage
+    const chats = getData('chats');
+    const chatIndex = chats.findIndex(c => c.idChat === chatAtual.idChat);
+    if (chatIndex !== -1) {
+      chats[chatIndex] = chatAtual;
+      setData('chats', chats);
+    }
+    
+    renderizarMensagens(chatAtual);
+  }
+
+  // Atualiza label e select do plano no login
+  loginTipo.addEventListener('change', () => {
+    if (loginTipo.value === 'vendedor') {
+      labelPlano.classList.remove('hidden');
+      loginPlano.classList.remove('hidden');
+      loginPlano.required = true;
+    } else {
+      labelPlano.classList.add('hidden');
+      loginPlano.classList.add('hidden');
+      loginPlano.required = false;
+    }
+  });
+
+  // Eventos botões navegação
+  btnHome.addEventListener('click', () => {
+    mostrarPagina('page-home');
+    mostrarProdutosDestaque();
+  });
+  btnProdutos.addEventListener('click', () => {
+    mostrarPagina('page-produtos');
+    mostrarListaProdutos();
+  });
+  btnCriarProduto.addEventListener('click', () => {
+    if (!usuarioLogado || usuarioLogado.tipo !== 'vendedor') {
+      alert('Apenas vendedores podem criar produtos.');
+      mostrarPagina('page-login');
+      return;
+    }
+    formCriarProduto.reset();
+    msgProduto.textContent = '';
+    mostrarPagina('page-criar-produto');
+  });
+  btnChat.addEventListener('click', () => {
+    if (!usuarioLogado) {
+      alert('Faça login para acessar o chat.');
+      mostrarPagina('page-login');
+      return;
+    }
+    carregarChat();
+    mostrarPagina('page-chat');
+  });
+  btnLogin.addEventListener('click', () => {
+    formLogin.reset();
+    msgLogin.textContent = '';
+    mostrarPagina('page-login');
+  });
+  btnLogout.addEventListener('click', () => {
+    deslogarUsuario();
+  });
+  logo.addEventListener('click', () => {
+    mostrarPagina('page-home');
+    mostrarProdutosDestaque();
+  });
+
+  // Filtros produtos
+  filtroTipoConta.addEventListener('change', mostrarListaProdutos);
+  filtroNome.addEventListener('input', mostrarListaProdutos);
+
+  // Formulário criar produto
+  formCriarProduto.addEventListener('submit', e => {
+    e.preventDefault();
+    if (!usuarioLogado || usuarioLogado.tipo !== 'vendedor') {
+      alert('Você precisa estar logado como vendedor para criar produtos.');
+      mostrarPagina('page-login');
+      return;
+    }
+    const nome = document.getElementById('produto-nome').value.trim();
+    const preco = parseFloat(document.getElementById('produto-preco').value);
+    const imagem = document.getElementById('produto-imagem').value.trim();
+    const plano = document.getElementById('produto-tipo-conta').value;
+
+    if (!nome || isNaN(preco) || preco <= 0 || !imagem) {
+      msgProduto.textContent = 'Preencha todos os campos corretamente.';
+      msgProduto.className = 'message-text error';
+      return;
+    }
+
+    const novoProduto = {
+      id: Date.now(),
+      nome,
+      preco,
+      imagem,
+      vendedor: usuarioLogado.usuario,
+      plano
+    };
+
+    adicionarProduto(novoProduto);
+
+    msgProduto.textContent = 'Produto cadastrado com sucesso!';
+    msgProduto.className = 'message-text success';
+    formCriarProduto.reset();
+
+    mostrarPagina('page-produtos');
+    mostrarListaProdutos();
+  });
+
+  // Formulário login/cadastro
+  formLogin.addEventListener('submit', e => {
+    e.preventDefault();
+    const tipo = loginTipo.value;
+    const usuario = document.getElementById('login-usuario').value.trim();
+    const plano = loginPlano.value;
+
+    if (!usuario || !tipo || (tipo === 'vendedor' && !plano)) {
+      msgLogin.textContent = 'Preencha todos os campos.';
+      msgLogin.className = 'message-text error';
+      return;
+    }
+
+    const sucesso = loginOuCadastro(usuario, tipo, plano);
+    if (sucesso) {
+      msgLogin.textContent = '';
+      msgLogin.className = 'message-text';
+      atualizarInterface();
+
+      // Se vendedor e não pagou taxa, obrigar pagamento PIX
+      if (usuarioLogado.tipo === 'vendedor' && !usuarioLogado.taxaPaga) {
+        alert(`Você deve pagar a taxa via PIX para a chave 408.839.948-01.\n
+Pode enviar o PIX em 10 minutos, senão será expulso.`);
+        iniciarContagemPIX();
+        pixInfo.classList.remove('hidden');
+        formCompra.classList.add('hidden');
+        mostrarPagina('page-compra');
+      } else {
+        mostrarPagina('page-home');
+        mostrarProdutosDestaque();
+      }
+    } else {
+      msgLogin.textContent = 'Erro ao logar ou cadastrar.';
+      msgLogin.className = 'message-text error';
+    }
+  });
+
+  // Formulário compra
+  formCompra.addEventListener('submit', e => {
+    e.preventDefault();
+    if (!produtoSelecionado) {
+      msgCompra.textContent = 'Nenhum produto selecionado.';
+      msgCompra.className = 'message-text error';
+      return;
+    }
+    const pagamento = formaPagamento.value;
+    if (!pagamento) {
+      msgCompra.textContent = 'Selecione a forma de pagamento.';
+      msgCompra.className = 'message-text error';
+      return;
+    }
+
+    msgCompra.textContent = '';
+    if (pagamento === 'PIX') {
+      // Mostrar instruções PIX e timer para vendedores pagarem taxa (se for vendedor)
+      if (usuarioLogado.tipo === 'vendedor' && !usuarioLogado.taxaPaga) {
+        pixInfo.classList.remove('hidden');
+        iniciarContagemPIX();
+      }
+      alert(`Você selecionou PIX. Lembre-se de pagar a taxa para continuar usando o site.`);
+    } else if (pagamento === 'ROB') {
+      // Compra sem taxa, simular sucesso
+      alert('Compra realizada com Robux com sucesso!');
+      mostrarPagina('page-home');
+      mostrarProdutosDestaque();
+    }
+  });
+
+  // Confirmar pagamento PIX
+  btnConfirmarPix.addEventListener('click', () => {
+    confirmarPagamentoPIX();
+  });
+
+  // Chat - enviar mensagem
+  chatForm.addEventListener('submit', e => {
+    e.preventDefault();
+    const texto = chatInput.value.trim();
+    if (!texto || !usuarioLogado) return;
+    
+    enviarMensagemChat(texto);
+    chatInput.value = '';
+  });
+
+  // Início da aplicação
+  carregarUsuarioLogado();
+  atualizarInterface();
+  mostrarPagina('page-home');
+  mostrarProdutosDestaque();
+
+</script>
+</body>
+</html>
